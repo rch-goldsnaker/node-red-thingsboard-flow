@@ -1,0 +1,388 @@
+[
+    {
+        "id": "ee131ae53512c141",
+        "type": "tab",
+        "label": "Node-Red-Thingsboard",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "5593237e9e5dfcf6",
+        "type": "opcua-compact-server",
+        "z": "ee131ae53512c141",
+        "port": 54845,
+        "endpoint": "",
+        "productUri": "",
+        "acceptExternalCommands": true,
+        "maxAllowedSessionNumber": "10",
+        "maxConnectionsPerEndpoint": "10",
+        "maxAllowedSubscriptionNumber": "100",
+        "alternateHostname": "",
+        "name": "",
+        "showStatusActivities": false,
+        "showErrors": true,
+        "allowAnonymous": true,
+        "individualCerts": false,
+        "isAuditing": false,
+        "serverDiscovery": true,
+        "users": [],
+        "xmlsetsOPCUA": [],
+        "publicCertificateFile": "",
+        "privateCertificateFile": "",
+        "registerServerMethod": "3",
+        "discoveryServerEndpointUrl": "opc.tcp://127.0.0.1:54845",
+        "capabilitiesForMDNS": "",
+        "maxNodesPerRead": 1000,
+        "maxNodesPerWrite": 1000,
+        "maxNodesPerHistoryReadData": 100,
+        "maxNodesPerBrowse": 3000,
+        "maxBrowseContinuationPoints": "10",
+        "maxHistoryContinuationPoints": "10",
+        "delayToInit": "1000",
+        "delayToClose": "200",
+        "serverShutdownTimeout": "100",
+        "addressSpaceScript": "function constructAlarmAddressSpace(server, addressSpace, eventObjects, done) {\n  const opcua = coreServer.choreCompact.opcua;\n  const namespace = addressSpace.getOwnNamespace();\n\n  // Inicializar la variable booleana \"start\" en false\n  this.sandboxFlowContext.set(\"start\", false);\n\n  // Crear la variable booleana en el espacio de direcciones OPC UA\n  namespace.addVariable({\n    organizedBy: addressSpace.rootFolder.objects,\n    browseName: \"start\", // Cambiado a \"start\"\n    nodeId: \"ns=1;s=SystemStatus_Start\",\n    dataType: \"Boolean\",\n    value: {\n      get: () => new opcua.Variant({\n        dataType: opcua.DataType.Boolean,\n        value: this.sandboxFlowContext.get(\"start\")\n      }),\n      set: (variant) => {\n        this.sandboxFlowContext.set(\"start\", variant.value);\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n\n  done();\n}\n",
+        "x": 140,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "2dc8ba6ecb59d35c",
+        "type": "mqtt out",
+        "z": "ee131ae53512c141",
+        "name": "",
+        "topic": "v1/devices/me/telemetry",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "bc67eea9c7d14059",
+        "x": 930,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "a886d20d8725a066",
+        "type": "inject",
+        "z": "ee131ae53512c141",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"temperature\":\"10\"}",
+        "payloadType": "json",
+        "x": 150,
+        "y": 240,
+        "wires": [
+            [
+                "2dc8ba6ecb59d35c"
+            ]
+        ]
+    },
+    {
+        "id": "dcd198ec481d1858",
+        "type": "debug",
+        "z": "ee131ae53512c141",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 960,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "1d2649837d1f5aa5",
+        "type": "mqtt in",
+        "z": "ee131ae53512c141",
+        "name": "",
+        "topic": "v1/devices/me/attributes",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "bc67eea9c7d14059",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 150,
+        "y": 520,
+        "wires": [
+            [
+                "048621840826e3b2"
+            ]
+        ]
+    },
+    {
+        "id": "ab24fa7773b50218",
+        "type": "OpcUa-Client2-Write",
+        "z": "ee131ae53512c141",
+        "inputs": 1,
+        "output": 4,
+        "name": "",
+        "endpoint": "5fda642d28df866f",
+        "attributeId": "Value",
+        "nodeId": "[start](ns=1;s=SystemStatus_Start)",
+        "x": 740,
+        "y": 520,
+        "wires": [
+            [
+                "e1e5dce45746268c"
+            ]
+        ]
+    },
+    {
+        "id": "e1e5dce45746268c",
+        "type": "debug",
+        "z": "ee131ae53512c141",
+        "name": "debug 2",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 960,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "3a53e04078cbe4cc",
+        "type": "inject",
+        "z": "ee131ae53512c141",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 530,
+        "y": 580,
+        "wires": [
+            [
+                "ab24fa7773b50218"
+            ]
+        ]
+    },
+    {
+        "id": "37abb83119c2761b",
+        "type": "inject",
+        "z": "ee131ae53512c141",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 530,
+        "y": 640,
+        "wires": [
+            [
+                "ab24fa7773b50218"
+            ]
+        ]
+    },
+    {
+        "id": "048621840826e3b2",
+        "type": "function",
+        "z": "ee131ae53512c141",
+        "name": "function 2",
+        "func": "const newMsg = {payload:msg.payload.motor}\nreturn newMsg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 520,
+        "wires": [
+            [
+                "ab24fa7773b50218"
+            ]
+        ]
+    },
+    {
+        "id": "fd7fdf080649cb0d",
+        "type": "http request",
+        "z": "ee131ae53512c141",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://thingsboard.cloud/api/v1/aLkzND7O3jRfV6MHJplf/telemetry",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 530,
+        "y": 300,
+        "wires": [
+            [
+                "dcd198ec481d1858"
+            ]
+        ]
+    },
+    {
+        "id": "5b15b3de85f8e2a4",
+        "type": "inject",
+        "z": "ee131ae53512c141",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"temperature\":\"20\"}",
+        "payloadType": "json",
+        "x": 150,
+        "y": 300,
+        "wires": [
+            [
+                "fd7fdf080649cb0d"
+            ]
+        ]
+    },
+    {
+        "id": "bc67eea9c7d14059",
+        "type": "mqtt-broker",
+        "name": "THINGSBOARD",
+        "broker": "mqtt.thingsboard.cloud",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "5fda642d28df866f",
+        "type": "OpcUa-Endpoint2",
+        "name": "",
+        "endpoint": "opc.tcp://LEGIONMIRU:54845/UA/NodeRED/Compact",
+        "securityMode": "None",
+        "securityPolicy": "None",
+        "userIdentityType": "Anonymous",
+        "pkiName": "",
+        "useTransport": false,
+        "maxChunkCount": "1",
+        "maxMessageSize": "8192",
+        "receiveBufferSize": "8192",
+        "sendBufferSize": "8192",
+        "subscriptions": [
+            {
+                "id": "s0",
+                "name": "Default Subscription",
+                "isDefault": true,
+                "parameters": {
+                    "publishingEnabled": true,
+                    "requestedLifetimeCount": "1000",
+                    "requestedMaxKeepAliveCount": "10",
+                    "requestedPublishingInterval": "1000",
+                    "maxNotificationsPerPublish": "0",
+                    "priority": "100"
+                }
+            },
+            {
+                "id": "s1",
+                "name": "Slow Subscription",
+                "isDefault": true,
+                "parameters": {
+                    "publishingEnabled": true,
+                    "requestedLifetimeCount": "100",
+                    "requestedMaxKeepAliveCount": "3",
+                    "requestedPublishingInterval": "5000",
+                    "maxNotificationsPerPublish": "100",
+                    "priority": "10"
+                }
+            },
+            {
+                "id": "s2",
+                "name": "Fast Subscription",
+                "isDefault": true,
+                "parameters": {
+                    "publishingEnabled": true,
+                    "requestedLifetimeCount": "4000",
+                    "requestedMaxKeepAliveCount": "50",
+                    "requestedPublishingInterval": "250",
+                    "maxNotificationsPerPublish": "100",
+                    "priority": "200"
+                }
+            }
+        ]
+    }
+]
